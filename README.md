@@ -4,7 +4,7 @@
 
 # Instructions
 1.     git clone https://github.com/M5HAYA/chromebook-audio-kip
-2.     cd chromebook-linux-audio
+2.     cd chromebook-audio-kip
 3.     ./setup-audio
 
 # Requirements
