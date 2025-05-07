@@ -159,103 +159,12 @@ def platform_config(platform, args):
         case "mdn":
             mdn_config()
 
-def get_platform():
-    # first check if we are on a chromeb{ook,ox,ase,let} (either sys_vendor or product_family includes "google" (case-insensitive for old devices where it was GOOGLE))
-    # product_family *usually* will tell us the platform
-    # some platforms (jsl, byt) dont have a product_family so instead check the id of pci device 00:00.0 (chipset/pch)
-    # for some reason, cyan also doesnt have this set even though every other bsw board does
-    # samus and buddy are BDW but use intel SST
-    print_header("Detecting platform")
-    platform = ""
-    sv = ""
-    pf = ""
-    pn = ""
-
-    with open("/sys/class/dmi/id/sys_vendor") as sys_vendor:
-        sv = sys_vendor.read().strip().lower()
-    with open("/sys/class/dmi/id/product_family") as product_family:
-        pf = product_family.read().strip().lower()
-    with open("/sys/class/dmi/id/product_name") as product_name:
-        pn = product_name.read().strip().lower()
-
-    # some people are morons
-    if pn == "crosvm":
-        print_error("This script can not and will not do anything in the crostini vm!")
-        exit(1)
-
-    if not "google" in sv and not "google" in pf:
-        print_error("This script is not supported on non-Chrome devices!")
-        exit(1)
-
-    if not len(pf) == 0:
-        match pf:
-            case "intel_strago":
-                print_status("Detected Intel Braswell")
-                platform = "bsw"
-            case "google_glados":
-                print_status("Detected Intel Skylake")
-                platform = "skl"
-            case "google_coral" | "google_reef":
-                print_status("Detected Intel Apollolake")
-                platform = "apl"
-            case "google_atlas" | "google_poppy" | "google_nami" | "google_nautilus" | "google_nocturne" | "google_rammus" | "google_soraka" | "google_eve" | "google_fizz" | "google_kalista" | "google_endeavour":
-                print_status("Detected Intel Kabylake")
-                platform = "kbl"
-            case "google_octopus":
-                print_status("Detected Intel Geminilake")
-                platform = "glk"
-            case "google_hatch" | "google_puff":
-                print_status("Detected Intel Cometlake")
-                platform = "cml"
-            case "google_volteer":
-                print_status("Detected Intel Tigerlake")
-                platform = "tgl"
-            case "google_brya" | "google_brask":
-                print_status("Detected Intel Alderlake")
-                platform = "adl"
-            case "google_nissa":
-                print_status("Detected Intel Alderlake-N")
-                platform = "adl"
-            case "google_rex":
-                print_status("Detected Intel Meteorlake")
-                platform = "mtl"
-            case "google_kahlee":
-                print_status("Detected AMD StoneyRidge")
-                platform = "st"
-            case "google_zork":
-                print_status("Detected AMD Picasso/Dali")
-                platform = "pco"
-            case "google_guybrush":
-                print_status("Detected AMD Cezanne")
-                platform = "czn"
-            case "google_skyrim":
-                print_status("Detected AMD Mendocino")
-                platform = "mdn"
-            case _:
-                print_error(f"Unknown platform/baseboard: {pf}")
-                exit(1)
-        return platform
-    else:
-        # Cyan special case
-        if pn == "cyan":
-            print_status("Detected Intel Braswell")
-            return "bsw"
-        # BDW special cases (every other BDW uses HDA audio)
-        if pn == "samus" or pn == "Hewlett-Packard":
-            print_status("Detected Intel Broadwell")
-            return "bdw"
         id = ""
         with open("/sys/bus/pci/devices/0000:00:00.0/device") as devid:
             id = devid.read().strip()
         # BYT special case - check if pci dev id is 0x0f00
         if id == "0x0f00":
-            print_status("Detected Intel Baytrail")
-            return "byt"
-        # JSL special case - check if pci dev id is 0x4e22
-        if id == "0x4e22":
-            print_status("Detected Intel Jasperlake")
-            return "jsl"
-
+           
 def mdn_config():
     print_header("Installing MDN SOF firmware")
     mkdir("/lib/firmware/amd/sof/community", create_parents=True)
