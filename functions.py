@@ -241,7 +241,7 @@ def get_platform():
             print_status("Detected Intel Braswell")
             return "bsw"
         # BDW special cases (every other BDW uses HDA audio)
-        if pn == "samus" or pn == "buddy":
+        if pn == "samus" or pn == "Hewlett-Packard":
             print_status("Detected Intel Broadwell")
             return "bdw"
         id = ""
